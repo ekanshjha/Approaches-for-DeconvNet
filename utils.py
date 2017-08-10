@@ -69,7 +69,7 @@ def data_preprocess(imglist, annotlist, session, height=224, width=224, num_clas
     return Data, Label, LabelOneHot
 
 def weight_variable(shape, name):
-    initial = tf.truncated_normal(shape, stddev=0.1)
+    initial = tf.truncated_normal(shape, stddev=0.01)
     return tf.Variable(initial,name=name, dtype=tf.float32)
     
 def bias_variable(shape, name):
@@ -79,7 +79,7 @@ def bias_variable(shape, name):
 def conv_layer(x_input, w, b, strides=[1, 1, 1, 1], padding='SAME',name='conv_'):
     with tf.name_scope(name):
         conv = tf.nn.conv2d(x_input, w, strides=strides, padding=padding)
-        act = tf.nn.sigmoid(conv + b)
+        act = tf.nn.relu(conv + b)
         tf.summary.histogram('conv/weights', w)
         tf.summary.histogram('conv/biases', b)
         tf.summary.histogram('conv/activation', act)
@@ -90,7 +90,7 @@ def deconv_layer(x_input, w, b, strides=[1, 1, 1, 1], padding='SAME',name='decon
         shape = tf.shape(x_input)
         out_shape = [shape[0], shape[1], shape[2], w.get_shape().as_list()[2]]
         deconv = tf.nn.conv2d_transpose(x_input, filter=w, output_shape=out_shape, strides=strides, padding=padding)    
-        act = tf.nn.sigmoid(deconv + b)
+        act = tf.nn.relu(deconv + b)
         tf.summary.histogram('deconv/weights', w)
         tf.summary.histogram('deconv/biases', b)
         tf.summary.histogram('deconv/activation', act)
